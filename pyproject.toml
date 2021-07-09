@@ -1,9 +1,15 @@
 [tool.poetry]
-name = "PythonTemplate"
+name = "SagasuSpider"
 version = "0.1.0"
-description = "A project template for python program"
-authors = ["mixmoe"]
+description = "A spider to get all subjects of bangumi.tv"
+authors = ["TheSagasu"]
 license = "MIT"
+packages = [
+    { include = "SagasuSpider" },
+]
+
+[tool.poetry.scripts]
+SagasuSpider = 'SagasuSpider.__main__:main'
 
 [tool.poetry.dependencies]
 python = "^3.8"
