@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: spider",
+            "type": "python",
+            "request": "launch",
+            "module": "SagasuSpider",
+            "args": [
+                "spider"
+            ]
+        }
+    ]
+}

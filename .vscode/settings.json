@@ -15,6 +15,11 @@
     "autoDocstring.customTemplatePath": ".vscode/docstring.mustache",
     "cSpell.words": [
         "Bangumi",
+        "Sagasu",
+        "aiofiles",
+        "asyncio",
+        "httpx",
+        "itertools",
         "pydantic"
     ],
     "editor.formatOnSave": true,
