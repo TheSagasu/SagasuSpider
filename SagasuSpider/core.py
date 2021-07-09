@@ -1,5 +1,4 @@
 import asyncio
-import json
 from functools import wraps
 from itertools import count
 from pathlib import Path
@@ -9,6 +8,7 @@ import aiofiles
 from httpx import AsyncClient, HTTPError
 
 from .log import logger
+from .models import BangumiSubject
 
 AsyncCallable_T = TypeVar("AsyncCallable_T", bound=Callable[..., Coroutine])
 
@@ -54,35 +54,34 @@ class SagasuSpider:
         path.parent.mkdir(exist_ok=True, parents=True)
         async with aiofiles.open(path, "wt", encoding="utf-8") as f:  # type:ignore
             total = await f.write(
-                json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True)
+                BangumiSubject.parse_obj(data).json(
+                    ensure_ascii=False, indent=4, sort_keys=True
+                )
             )
         return total
 
-    async def spider(self, id: int, sem: asyncio.Semaphore):
-        async with sem:
-            try:
-                result = await self.subject(id)
-                total = await self.persist(id, result)
-            except Exception:
-                logger.exception(f"Exception occurred while requiring subject {id}")
-            else:
-                logger.debug(f"Subject <g>{id}</g> saved successfully. {total=}")
+    async def spider(self, id: int):
+        logger.info(f"Page of bangumi {id} started.")
+        try:
+            result = await self.subject(id)
+            total = await self.persist(id, result)
+        except Exception:
+            logger.exception(f"Exception occurred while requiring subject {id}")
+        else:
+            logger.debug(f"Subject <g>{id}</g> saved successfully. {total=}")
 
     async def __call__(self):
         sem = asyncio.Semaphore(self.parallel)
 
         def pagination():
-            for begin in count(self.begin, self.parallel * 2):
-                if (begin >= self.end) and (self.end >= 0):
+            for current in count(self.begin):
+                if self.end > 0 and current >= self.end:
                     break
-
-                yield [*range(begin, begin + self.parallel * 2)]
+                yield current
             return
 
         for page in pagination():
-            logger.info(f"Next pages: <e>{', '.join(map(str, page))}</e>")
-            if not page:
-                break
-            await asyncio.gather(
-                *map(lambda id: self.spider(id, sem), page), return_exceptions=True
-            )
+            await sem.acquire()
+            task = asyncio.create_task(self.spider(page))
+            task.add_done_callback(lambda _: sem.release())
+            task.set_name(f"Page-{page} Task")
