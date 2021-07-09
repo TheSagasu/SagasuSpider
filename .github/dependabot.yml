@@ -10,4 +10,5 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: ":arrow_up:"
+      prefix: "chore(deps): "
+    versioning-strategy: lockfile-only
