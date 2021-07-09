@@ -1,2 +1,3 @@
-# PythonTemplate
-A project template for python program
+# SagasuSpider
+
+A spider to get all subjects of bangumi.tv
