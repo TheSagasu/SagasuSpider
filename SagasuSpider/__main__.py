@@ -43,7 +43,7 @@ def main():
     show_default=True,
 )
 def spider(start: int, end: int, parallel: int, output: Path):
-    from SagasuSpider.core import SagasuSpider
+    from SagasuSpider.spider import SagasuSpider
 
     instance = SagasuSpider(parallel, start, end, output)
 
