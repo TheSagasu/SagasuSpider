@@ -22,7 +22,7 @@ class SagasuUpload:
     def __init__(
         self, base: str, path: Path = Path(".") / "data", parallel: int = 8
     ) -> None:
-        self.client = httpx.AsyncClient(base_url=base)
+        self.client = httpx.AsyncClient(http2=True, base_url=base)
         self.path, self.parallel = path, parallel
 
     def subject2series(self, subject: BangumiSubject) -> CreateSagasuSeries:

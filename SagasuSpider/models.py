@@ -14,7 +14,7 @@ class DataModel(BaseModel):
         extra = Extra.allow
 
 
-class UploadModel(DataModel):
+class UploadModel(BaseModel):
     def export(self, **kwargs):
         return json.loads(self.json(**kwargs))
 

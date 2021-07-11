@@ -50,12 +50,9 @@ class SagasuSpider:
     async def persist(self, id: int, data: Dict[str, Any]) -> int:
         path = self.path / f"{id}.json"
         path.parent.mkdir(exist_ok=True, parents=True)
+        json = BangumiSubject.parse_obj(data).json(ensure_ascii=False, indent=4)
         async with aiofiles.open(path, "wt", encoding="utf-8") as f:  # type:ignore
-            total = await f.write(
-                BangumiSubject.parse_obj(data).json(
-                    ensure_ascii=False, indent=4, sort_keys=True
-                )
-            )
+            total = await f.write(json)
         return total
 
     async def spider(self, id: int):
