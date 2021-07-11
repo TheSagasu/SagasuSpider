@@ -1,43 +1,22 @@
-import re
-from datetime import date
+import json
+from datetime import datetime
 from enum import IntEnum
 from typing import List, Optional
 
-from pydantic import BaseModel, validator
+import dateparser
+from pydantic import validator
 from pydantic.fields import Field
-from pydantic.main import Extra
-
-
-class BangumiDate(date):
-    regex = re.compile(r"(\d+)\D+(\d+)\D+(\d+)\D*")
-
-    @classmethod
-    def validate(cls, value):
-        if isinstance(value, cls):
-            return value
-        elif isinstance(value, str):
-            try:
-                return cls.fromisoformat(value)
-            except Exception:
-                pass
-            year, month, day = map(
-                int, cls.regex.match(value).groups()  # type:ignore
-            )
-            try:
-                return cls(year, month, day)
-            except Exception:
-                return None
-        else:
-            raise TypeError("Expected str or date")
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+from pydantic.main import BaseModel, Extra
 
 
 class DataModel(BaseModel):
     class Config:
         extra = Extra.allow
+
+
+class UploadModel(DataModel):
+    def export(self, **kwargs):
+        return json.loads(self.json(**kwargs))
 
 
 class BangumiSubjectType(IntEnum):
@@ -64,7 +43,7 @@ class BangumiEpisode(DataModel):
     name: Optional[str] = None
     name_cn: Optional[str] = None
     sort: float
-    air_date: Optional[BangumiDate] = Field(alias="airdate")
+    air_date: Optional[datetime] = Field(alias="airdate")
 
     @validator("name", "name_cn")
     def validate_string(cls, value):
@@ -73,6 +52,10 @@ class BangumiEpisode(DataModel):
         stripped = value.strip()
         return stripped if stripped else None
 
+    @validator("air_date", pre=True)
+    def validate_date(cls, value):
+        return dateparser.parse(value) if isinstance(value, str) else value
+
 
 class BangumiSubject(DataModel):
     id: int
@@ -80,7 +63,7 @@ class BangumiSubject(DataModel):
     name: str
     name_cn: Optional[str] = None
     summary: Optional[str] = None
-    air_date: Optional[BangumiDate] = None
+    air_date: Optional[datetime] = None
     eps: List[BangumiEpisode] = []
 
     @validator("name_cn", "summary")
@@ -93,3 +76,32 @@ class BangumiSubject(DataModel):
     @validator("eps", pre=True)
     def validate_eps(cls, value):
         return value if isinstance(value, list) else []
+
+    @validator("air_date", pre=True)
+    def validate_date(cls, value):
+        return dateparser.parse(value) if isinstance(value, str) else value
+
+
+class CreateSagasuSeries(UploadModel):
+    name: str
+    name_cn: Optional[str] = None
+    description: Optional[str] = None
+    air_date: Optional[datetime] = None
+    bangumi_id: int
+
+
+class ReadSagasuSeries(CreateSagasuSeries):
+    id: int
+
+
+class CreateSagasuEpisodes(UploadModel):
+    name: Optional[str] = None
+    name_cn: Optional[str] = None
+    sort: float
+    type: BangumiEpisodeType
+    series: int
+    air_date: Optional[datetime] = None
+
+
+class ReadSagasuEpisodes(CreateSagasuEpisodes):
+    id: int

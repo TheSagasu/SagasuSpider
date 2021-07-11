@@ -43,9 +43,7 @@ class SagasuSpider:
 
     @retry_transport
     async def subject(self, id: int) -> Dict[str, Any]:
-        result = await self.client.get(
-            f"/subject/{id}", params={"resposeGroup": "large"}
-        )
+        result = await self.client.get(f"/subject/{id}?responseGroup=large")
         result.raise_for_status()
         return result.json()
 
