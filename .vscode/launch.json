@@ -9,6 +9,17 @@
             "args": [
                 "spider"
             ]
+        },
+        {
+            "name": "Python: upload",
+            "type": "python",
+            "request": "launch",
+            "module": "SagasuSpider",
+            "args": [
+                "upload",
+                "--base",
+                "http://127.0.0.1:3000"
+            ]
         }
     ]
 }
