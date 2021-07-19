@@ -75,7 +75,7 @@ class SagasuUpload:
         return episodes
 
     async def process(self, file: Path):
-        logger.info(f"Processing file {file}")
+        logger.debug(f"Processing file {file}")
         try:
             async with aiofiles.open(file, "rt") as f:  # type:ignore
                 data = json.loads(await f.read())
@@ -83,6 +83,7 @@ class SagasuUpload:
             if subject.type is not BangumiSubjectType.Anime:
                 return
             await self.upload(subject)
+            logger.debug(f"Uploaded subject {subject.id=}")
         except Exception as e:
             logger.exception(f'Exception "{e}" occurred during upload file {file}:')
 
