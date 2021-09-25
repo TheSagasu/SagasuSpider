@@ -1,7 +1,7 @@
-import sys
 from typing import TYPE_CHECKING
 
 from loguru import logger as _logger
+from tqdm import tqdm
 
 if TYPE_CHECKING:
     from loguru import Logger
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 logger: "Logger" = _logger
 logger.remove()
 logger.add(
-    sys.stdout,
+    lambda s: tqdm.write(s, end=""),
     format=(
         "<level>"
         "<v>{level:^8}</v>"
