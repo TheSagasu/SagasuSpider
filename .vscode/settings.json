@@ -14,13 +14,14 @@
     },
     "autoDocstring.customTemplatePath": ".vscode/docstring.mustache",
     "cSpell.words": [
-        "Bangumi",
-        "Sagasu",
         "aiofiles",
         "asyncio",
+        "Bangumi",
         "httpx",
         "itertools",
-        "pydantic"
+        "pydantic",
+        "Sagasu",
+        "tqdm"
     ],
     "editor.formatOnSave": true,
     "files.watcherExclude": {
